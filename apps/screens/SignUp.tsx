@@ -20,7 +20,7 @@ import { RootParamList } from '../navigations'
 import { BASE_COLOR } from '../utilities/baseColor'
 import { MaterialIcons } from '@expo/vector-icons'
 import { FirestoreDB } from '../firebase/firebaseDB'
-import { IUserModel } from '../models/index'
+import { COLLECTION, IUserModel } from '../models/index'
 import * as Application from 'expo-application'
 import { firebaseConfigs } from '../configs'
 
@@ -37,6 +37,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenPropsTypes) {
     isError: false,
     message: ''
   })
+
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSetEmail = (input: string) => {
@@ -85,7 +86,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenPropsTypes) {
 
       await createUserWithEmailAndPassword(firebaseConfigs.auth, email, password)
 
-      const userDb = new FirestoreDB('User')
+      const userDb = new FirestoreDB(COLLECTION.USERS)
 
       const userData: IUserModel = {
         userName: name,

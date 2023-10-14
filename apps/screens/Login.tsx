@@ -17,9 +17,8 @@ import Layout from '../components/Layout'
 import { RootParamList } from '../navigations'
 import { BASE_COLOR } from '../utilities/baseColor'
 import { MaterialIcons } from '@expo/vector-icons'
-
 import { signInWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '../configs'
+import { firebaseConfigs } from '../configs'
 
 type LoginScreenPropsTypes = NativeStackScreenProps<RootParamList, 'Login'>
 
@@ -63,9 +62,8 @@ export default function LoginScreen({ navigation }: LoginScreenPropsTypes) {
         throw Error('password minimal 6 karakter!')
       }
 
-      await signInWithEmailAndPassword(auth, email, password)
+      await signInWithEmailAndPassword(firebaseConfigs.auth, email, password)
     } catch (error: any) {
-      console.log(error)
       switch (error.code) {
         case 'auth/invalid-email':
           error.message = 'email tidak valid'

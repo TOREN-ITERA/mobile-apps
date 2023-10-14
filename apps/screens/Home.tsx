@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Box, HStack, Text, ScrollView, Pressable } from 'native-base'
+import { HStack, Text, ScrollView, Pressable, View, Center } from 'native-base'
 import Layout from '../components/Layout'
 import { Ionicons } from '@expo/vector-icons'
 import { RootParamList } from '../navigations'
@@ -7,18 +7,38 @@ import { RefreshControl, TouchableOpacity } from 'react-native'
 import { BASE_COLOR } from '../utilities/baseColor'
 import { useEffect, useLayoutEffect, useState } from 'react'
 import SkeletonHomeScreen from '../components/skeleton/HomeScreenSkeleton'
-import { View, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { useAppContext } from '../context/app.context'
+import { FirestoreDB } from '../firebase/firebaseDB'
+import { COLLECTION, IDeviceModel } from '../models'
 
 type HomeScreenPropsTypes = NativeStackScreenProps<RootParamList, 'Home'>
 
 export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
-  const {} = useAppContext()
+  const { currentUser } = useAppContext()
   const [isLoading, setIsLoading] = useState(true)
+  const [currentDevice, setCurrentDevice] = useState<IDeviceModel>()
+  const [controleDevice, setControleDevice] = useState(false)
 
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 5000)
+    setTimeout(() => setIsLoading(false), 2000)
   }, [])
+
+  const handleUpdateDeviceStatus = async () => {
+    const deviceDB = new FirestoreDB(COLLECTION.DEVICES)
+    const previousDevice = await deviceDB.getDocument({ documentId: 'device' })
+    setControleDevice(!controleDevice)
+
+    if (previousDevice) {
+      await deviceDB.updateDocument({
+        documentId: 'device',
+        newData: { deviceStatus: !controleDevice }
+      })
+      setCurrentDevice(previousDevice)
+    }
+  }
+
+  console.log(currentDevice)
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -26,20 +46,20 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
       headerLeft: () => (
         <HStack px='2' alignItems='center' space={2}>
           <Text color={BASE_COLOR.text.primary} fontSize='xl'>
-            {userInfo.isAuth ? `Hi, Test` : 'Welcome'}
+            {currentUser.userAuthentication ? `Hi, ${currentUser.userName} ` : 'Welcome'}
           </Text>
         </HStack>
       ),
       headerRight: () => (
         <HStack px='3' alignItems='center' space={2}>
-          {userInfo.isAuth && (
+          {currentUser.userAuthentication && (
             <TouchableOpacity onPress={() => navigation.navigate('Notification')}>
               <Ionicons
                 name='ios-notifications'
                 size={25}
                 color={BASE_COLOR.text.primary}
               />
-              {userInfo.notifications?.length !== 0 && (
+              {/* {userInfo.notifications?.length !== 0 && (
                 <Box
                   rounded='full'
                   backgroundColor='red.500'
@@ -49,10 +69,10 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
                   position='absolute'
                   zIndex='2'
                 />
-              )}
+              )} */}
             </TouchableOpacity>
           )}
-          {!userInfo.isAuth && (
+          {!currentUser.userAuthentication && (
             <Pressable
               borderWidth='1'
               borderColor={BASE_COLOR.text.primary}
@@ -73,8 +93,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
         </HStack>
       )
     })
-  }, [userInfo.isAuth])
-  const [isOn, setIsOn] = useState(false)
+  }, [currentUser])
 
   return (
     <Layout>
@@ -84,11 +103,23 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
           showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => {}} />}
         >
-          <TouchableOpacity style={styles.buttonContainer} onPress={() => setIsOn(!isOn)}>
-            <View style={[styles.circle, { backgroundColor: isOn ? 'green' : 'red' }]}>
-              <Text style={styles.buttonText}>{isOn ? 'On' : 'Off'}</Text>
-            </View>
-          </TouchableOpacity>
+          <Center flex={1} alignItems='center' justifyContent='center'>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={handleUpdateDeviceStatus}
+            >
+              <View
+                style={[
+                  styles.circle,
+                  {
+                    backgroundColor: controleDevice ? BASE_COLOR.primary : BASE_COLOR.gray
+                  }
+                ]}
+              >
+                <Text style={styles.buttonText}>{controleDevice ? 'On' : 'Off'}</Text>
+              </View>
+            </TouchableOpacity>
+          </Center>
         </ScrollView>
       )}
     </Layout>
@@ -97,13 +128,14 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
 
 const styles = StyleSheet.create({
   buttonContainer: {
+    marginTop: 250,
     alignItems: 'center',
     justifyContent: 'center'
   },
   circle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
     alignItems: 'center',
     justifyContent: 'center'
   },

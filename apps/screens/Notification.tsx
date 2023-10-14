@@ -2,36 +2,33 @@ import { FlatList, HStack, Text, VStack } from 'native-base'
 import Layout from '../components/Layout'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootParamList } from '../navigations'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BASE_COLOR } from '../utilities/baseColor'
-import { RootContext } from '../utilities/rootContext'
-import { ContextApiTypes, NotificationsTypes } from '../models'
-import { FirestoreDB } from '../firebase/firebaseDB'
 import EmptyAnimation from '../components/animations/Empty'
 import {
-  getDataFromLocalStorage,
   removeDataFromLocalStorage,
   saveDataToLocalStorage
 } from '../localStorage/localStorageDB'
 import ListSkeleton from '../components/skeleton/ListSkeleton'
+import { useAppContext } from '../context/app.context'
+import { INotificationModel } from '../models'
 
 type NotificationScreenPropsTypes = NativeStackScreenProps<RootParamList, 'Notification'>
 
 const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
-  const { userInfo } = useContext<ContextApiTypes>(RootContext)
-  const { setUserInfo }: any = useContext(RootContext)
-  const [notificationList, setNotificationList] = useState<NotificationsTypes[]>([])
+  const { currentUser } = useAppContext()
+  const [notificationList, setNotificationList] = useState<INotificationModel[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  const LOCALSTORAGE_NOTIFICATION_KEY = `notification_${userInfo.email}`
+  const LOCALSTORAGE_NOTIFICATION_KEY = `notification_${currentUser.userEmail}`
 
-  const removeNotificationFromFirestore = async () => {
-    const updateCoin = new FirestoreDB('User')
-    await updateCoin.update({
-      documentId: userInfo.email,
-      newData: { notifications: [] }
-    })
-  }
+  // const removeNotificationFromFirestore = async () => {
+  //   const user = new FirestoreDB(COLLECTION.USERS)
+  //   await user.updateDocument({
+  //     documentId: currentUser.email,
+  //     newData: { notifications: [] }
+  //   })
+  // }
 
   const updateNotificationFromLocalStorage = async (newNotification: any) => {
     await removeDataFromLocalStorage({ key: LOCALSTORAGE_NOTIFICATION_KEY })
@@ -39,11 +36,6 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
       key: LOCALSTORAGE_NOTIFICATION_KEY,
       item: newNotification
     })
-    await removeNotificationFromFirestore()
-  }
-
-  const updateUserInfo = () => {
-    setUserInfo({ ...userInfo, notifications: [] })
   }
 
   useEffect(() => {
@@ -76,7 +68,7 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
       {notificationList.length !== 0 && (
         <FlatList
           data={notificationList}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.notificationId}
           renderItem={({ item }) => (
             <VStack
               backgroundColor={'#FFF'}
@@ -89,12 +81,12 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
             >
               <HStack>
                 <Text fontSize='16' color={BASE_COLOR.text.primary}>
-                  {item.message}
+                  {item.notificationMessage}
                 </Text>
               </HStack>
               <HStack justifyContent='flex-end'>
                 <Text fontSize='11' color={BASE_COLOR.text.primary}>
-                  {item.createdAt}
+                  {item.notificationCreatedAt}
                 </Text>
               </HStack>
             </VStack>

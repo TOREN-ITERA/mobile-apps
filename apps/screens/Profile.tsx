@@ -1,35 +1,28 @@
-import React, { ReactNode, useContext, useState } from 'react'
+import React, { ReactNode, useEffect, useLayoutEffect, useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Avatar, HStack, Text, VStack } from 'native-base'
 import Layout from '../components/Layout'
 import { RootParamList } from '../navigations'
-import {
-  FontAwesome5,
-  Ionicons,
-  AntDesign,
-  MaterialCommunityIcons,
-  MaterialIcons
-} from '@expo/vector-icons'
+import { Ionicons, AntDesign } from '@expo/vector-icons'
 import { BASE_COLOR } from '../utilities/baseColor'
 import { TouchableOpacity } from 'react-native'
-import { RootContext } from '../utilities/rootContext'
-import { ContextApiTypes } from '../models'
 import { signOut } from 'firebase/auth'
-import { auth } from '../configs'
 import ModalPrimary from '../components/Modal/ModalPrimary'
 import * as Application from 'expo-application'
 import { Share, Linking } from 'react-native'
+import { useAppContext } from '../context/app.context'
+import { firebaseConfigs } from '../configs'
 
 type ProfilePropsTypes = NativeStackScreenProps<RootParamList, 'Profile'>
 
 export default function ProfileScreen({ navigation }: ProfilePropsTypes) {
-  const { userInfo } = useContext<ContextApiTypes>(RootContext)
+  const { currentUser } = useAppContext()
   const [openModal, setOpenModal] = useState(false)
 
   const lastUpdate = Application.getLastUpdateTimeAsync().then(console.log)
 
   const handleLogOut = async () => {
-    await signOut(auth)
+    await signOut(firebaseConfigs.auth)
   }
 
   const ratingPlayStore = () => {
@@ -46,6 +39,20 @@ export default function ProfileScreen({ navigation }: ProfilePropsTypes) {
     }
   }
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => setOpenModal(true)}>
+          <HStack px={'10'}>
+            <Ionicons name='exit-outline' size={24} color={BASE_COLOR.text.primary} />
+            <Text mx={2} fontSize='md' fontWeight='bold' color={BASE_COLOR.text.primary}>
+              Keluar
+            </Text>
+          </HStack>
+        </TouchableOpacity>
+      )
+    })
+  }, [])
   return (
     <Layout>
       <VStack
@@ -55,43 +62,24 @@ export default function ProfileScreen({ navigation }: ProfilePropsTypes) {
         space={2}
         borderWidth={1}
         borderColor='gray.200'
-        my={1}
+        my={5}
         borderRadius='5'
         rounded='md'
       >
-        <HStack alignItems='center' space={2}>
-          <Avatar backgroundColor={BASE_COLOR.green}>{userInfo.name[0]}</Avatar>
+        <VStack alignItems='center' space={2}>
+          <Avatar
+            backgroundColor={BASE_COLOR.primary}
+            size='xl'
+            source={{
+              uri: 'https://vasundharaodisha.org/upload/84552no-user.jpg'
+            }}
+          />
+
           <Text fontFamily='lato' fontSize='xl' color={BASE_COLOR.text.primary}>
-            {userInfo.name}
+            {currentUser.userName}
           </Text>
-          <Text color={BASE_COLOR.text.primary}>{userInfo.email}</Text>
-        </HStack>
-      </VStack>
-
-      <VStack mt={8}>
-        <CardProfileList onPress={ratingPlayStore}>
-          <AntDesign name='star' size={24} color={BASE_COLOR.text.primary} />
-          <Text fontSize='md' fontWeight='bold' color={BASE_COLOR.text.primary}>
-            Beri Rating
-          </Text>
-          <Text fontSize='sm' fontWeight='bold' color={BASE_COLOR.text.primary}>
-            v{Application.nativeApplicationVersion}
-          </Text>
-        </CardProfileList>
-
-        <CardProfileList onPress={onShare}>
-          <Ionicons name='ios-people' size={24} color={BASE_COLOR.text.primary} />
-          <Text fontSize='md' fontWeight='bold' color={BASE_COLOR.text.primary}>
-            Bagikan ke teman mu
-          </Text>
-        </CardProfileList>
-
-        <CardProfileList onPress={() => setOpenModal(true)}>
-          <Ionicons name='exit-outline' size={24} color={BASE_COLOR.text.primary} />
-          <Text fontSize='md' fontWeight='bold' color={BASE_COLOR.text.primary}>
-            Keluar
-          </Text>
-        </CardProfileList>
+          <Text color={BASE_COLOR.text.primary}>{currentUser.userEmail}</Text>
+        </VStack>
       </VStack>
 
       <ModalPrimary

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Feather, AntDesign } from '@expo/vector-icons'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -9,9 +9,14 @@ import SignUpScreen from '../screens/SignUp'
 import LoginScreen from '../screens/Login'
 import { BASE_COLOR } from '../utilities/baseColor'
 import NotificationScreen from '../screens/Notification'
-import { RootContext } from '../utilities/rootContext'
-import { ContextApiTypes } from '../models'
 import { heightPercentage } from '../utilities/dimension'
+import { useAppContext } from '../context/app.context'
+import { onAuthStateChanged } from 'firebase/auth'
+import { firebaseConfigs } from '../configs'
+import { FirestoreDB } from '../firebase/firebaseDB'
+import { COLLECTION, IUserModel } from '../models'
+import { StatusBar, View } from 'react-native'
+import { Text } from 'native-base'
 
 export type RootParamList = {
   Main: undefined
@@ -25,7 +30,6 @@ export type RootParamList = {
 const Tab = createBottomTabNavigator<RootParamList>()
 
 function TabNavigation() {
-  const { userInfo } = useContext<ContextApiTypes>(RootContext)
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -51,15 +55,11 @@ function TabNavigation() {
         component={HomeScreen}
       />
 
-      {userInfo.isAuth && (
-        <>
-          <Tab.Screen
-            name='Profile'
-            options={{ tabBarLabel: 'Profile' }}
-            component={ProfileScreen}
-          />
-        </>
-      )}
+      <Tab.Screen
+        name='Profile'
+        options={{ tabBarLabel: 'Profile' }}
+        component={ProfileScreen}
+      />
     </Tab.Navigator>
   )
 }
@@ -75,7 +75,54 @@ const MyTheme = {
 }
 
 export default function AppNavigations() {
-  const { userInfo } = useContext<ContextApiTypes>(RootContext)
+  const { currentUser, setCurrentUser, setDevice } = useAppContext()
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    onAuthStateChanged(firebaseConfigs.auth, (user) => {
+      ;(async () => {
+        if (user) {
+          const userDb = new FirestoreDB(COLLECTION.USERS)
+          const userData: IUserModel = await userDb.getDocument({
+            documentId: user.email + ''
+          })
+          userData.userAuthentication = true
+          console.log(userData)
+          setCurrentUser(userData)
+        }
+
+        if (!user) {
+          const userData: IUserModel = {
+            userAuthentication: false,
+            userEmail: '',
+            userName: '',
+            userId: '',
+            userPassword: ''
+          }
+          setCurrentUser(userData)
+        }
+
+        const appInfoDB = new FirestoreDB(COLLECTION.APP)
+
+        setIsLoading(false)
+      })()
+    })
+  }, [])
+
+  if (isLoading)
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#FFF'
+        }}
+      >
+        <Text style={{ color: BASE_COLOR.text.primary }}>Loading...</Text>
+        <StatusBar barStyle='default' backgroundColor='#FFF' />
+      </View>
+    )
 
   return (
     <NavigationContainer theme={MyTheme}>
@@ -85,19 +132,19 @@ export default function AppNavigations() {
           headerTitleStyle: { fontFamily: 'lato', color: BASE_COLOR.text.primary }
         }}
       >
-        <Stack.Screen
-          name='Main'
-          component={TabNavigation}
-          options={{
-            headerShown: false
-          }}
-        />
-        {userInfo.isAuth && (
+        {currentUser.userAuthentication && (
           <>
+            <Stack.Screen
+              name='Main'
+              component={TabNavigation}
+              options={{
+                headerShown: false
+              }}
+            />
             <Stack.Screen name='Notification' component={NotificationScreen} />
           </>
         )}
-        {!userInfo.isAuth && (
+        {!currentUser.userAuthentication && (
           <>
             <Stack.Screen name='Login' component={LoginScreen} />
             <Stack.Screen name='SignUp' component={SignUpScreen} />
