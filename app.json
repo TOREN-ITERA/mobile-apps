@@ -1,0 +1,40 @@
+{
+	"expo": {
+		"name": "edufire",
+		"slug": "UTBK",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"splash": {
+			"image": "./assets/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#1E90FF"
+		},
+		"updates": {
+			"fallbackToCacheTimeout": 0
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": true
+		},
+		"android": {
+			"versionCode": 16,
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/adaptive-icon.png",
+				"backgroundColor": "#1E90FF"
+			},
+			"package": "com.misdar.utbk"
+		},
+		"web": {
+			"favicon": "./assets/favicon.png"
+		},
+		"extra": {
+			"eas": {
+				"projectId": ""
+			}
+		}
+	},
+	"react-native-google-mobile-ads": {
+		"android_app_id": ""
+	}
+}
