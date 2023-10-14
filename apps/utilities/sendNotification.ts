@@ -1,17 +1,20 @@
-import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-import { DB } from "../configs/firebase";
-import { NotificationsTypes } from "../types";
+import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore'
+import { DB } from '../configs'
+import { NotificationsTypes } from '../models'
 
 export interface SendNotificationTypes {
-	docomentID: string;
-	message: NotificationsTypes;
+  docomentID: string
+  message: NotificationsTypes
 }
 
-export const sendNotification = async ({ docomentID, message }: SendNotificationTypes) => {
-	const currentDateTime = new Date();
-	const UserDBRef = doc(DB, "User", docomentID);
+export const sendNotification = async ({
+  docomentID,
+  message
+}: SendNotificationTypes) => {
+  const currentDateTime = new Date()
+  const UserDBRef = doc(DB, 'User', docomentID)
 
-	await updateDoc(UserDBRef, {
-		notifications: arrayUnion({ ...message, createdAt: currentDateTime.toDateString() }),
-	});
-};
+  await updateDoc(UserDBRef, {
+    notifications: arrayUnion({ ...message, createdAt: currentDateTime.toDateString() })
+  })
+}

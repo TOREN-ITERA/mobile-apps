@@ -1,20 +1,19 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Box, HStack, Text, ScrollView, Pressable } from 'native-base'
-import Layout from '../../components/Layout'
+import Layout from '../components/Layout'
 import { Ionicons } from '@expo/vector-icons'
-import { RootParamList } from '../../navigations'
+import { RootParamList } from '../navigations'
 import { RefreshControl, TouchableOpacity } from 'react-native'
-import { BASE_COLOR } from '../../utilities/baseColor'
-import { useContext, useEffect, useLayoutEffect, useState } from 'react'
-import SkeletonHomeScreen from '../../components/skeleton/HomeScreenSkeleton'
-import { RootContext } from '../../utilities/rootContext'
-import { ContextApiTypes } from '../../types'
+import { BASE_COLOR } from '../utilities/baseColor'
+import { useEffect, useLayoutEffect, useState } from 'react'
+import SkeletonHomeScreen from '../components/skeleton/HomeScreenSkeleton'
 import { View, StyleSheet } from 'react-native'
+import { useAppContext } from '../context/app.context'
 
 type HomeScreenPropsTypes = NativeStackScreenProps<RootParamList, 'Home'>
 
 export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
-  const { userInfo, appInfo } = useContext<ContextApiTypes>(RootContext)
+  const {} = useAppContext()
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {

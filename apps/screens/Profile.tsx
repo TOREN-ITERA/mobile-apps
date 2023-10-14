@@ -1,8 +1,8 @@
 import React, { ReactNode, useContext, useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Avatar, HStack, Text, VStack } from 'native-base'
-import Layout from '../../components/Layout'
-import { RootParamList } from '../../navigations'
+import Layout from '../components/Layout'
+import { RootParamList } from '../navigations'
 import {
   FontAwesome5,
   Ionicons,
@@ -10,13 +10,13 @@ import {
   MaterialCommunityIcons,
   MaterialIcons
 } from '@expo/vector-icons'
-import { BASE_COLOR } from '../../utilities/baseColor'
+import { BASE_COLOR } from '../utilities/baseColor'
 import { TouchableOpacity } from 'react-native'
-import { RootContext } from '../../utilities/rootContext'
-import { ContextApiTypes } from '../../types'
+import { RootContext } from '../utilities/rootContext'
+import { ContextApiTypes } from '../models'
 import { signOut } from 'firebase/auth'
-import { auth } from '../../configs/firebase'
-import ModalPrimary from '../../components/Modal/ModalPrimary'
+import { auth } from '../configs'
+import ModalPrimary from '../components/Modal/ModalPrimary'
 import * as Application from 'expo-application'
 import { Share, Linking } from 'react-native'
 

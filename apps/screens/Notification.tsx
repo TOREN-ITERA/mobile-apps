@@ -1,19 +1,19 @@
 import { FlatList, HStack, Text, VStack } from 'native-base'
-import Layout from '../../components/Layout'
+import Layout from '../components/Layout'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootParamList } from '../../navigations'
+import { RootParamList } from '../navigations'
 import { useContext, useEffect, useState } from 'react'
-import { BASE_COLOR } from '../../utilities/baseColor'
-import { RootContext } from '../../utilities/rootContext'
-import { ContextApiTypes, NotificationsTypes } from '../../types'
-import { FirestoreDB } from '../../firebase/firebaseDB'
-import EmptyAnimation from '../../components/animations/Empty'
+import { BASE_COLOR } from '../utilities/baseColor'
+import { RootContext } from '../utilities/rootContext'
+import { ContextApiTypes, NotificationsTypes } from '../models'
+import { FirestoreDB } from '../firebase/firebaseDB'
+import EmptyAnimation from '../components/animations/Empty'
 import {
   getDataFromLocalStorage,
   removeDataFromLocalStorage,
   saveDataToLocalStorage
-} from '../../localStorage/localStorageDB'
-import ListSkeleton from '../../components/skeleton/ListSkeleton'
+} from '../localStorage/localStorageDB'
+import ListSkeleton from '../components/skeleton/ListSkeleton'
 
 type NotificationScreenPropsTypes = NativeStackScreenProps<RootParamList, 'Notification'>
 

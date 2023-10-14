@@ -1,7 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '../../configs/firebase'
-
 import {
   Box,
   FormControl,
@@ -16,30 +14,23 @@ import {
   VStack,
   WarningOutlineIcon
 } from 'native-base'
-
-import { useContext, useState } from 'react'
-import Layout from '../../components/Layout'
-import { RootParamList } from '../../navigations'
-import { BASE_COLOR } from '../../utilities/baseColor'
+import { useState } from 'react'
+import Layout from '../components/Layout'
+import { RootParamList } from '../navigations'
+import { BASE_COLOR } from '../utilities/baseColor'
 import { MaterialIcons } from '@expo/vector-icons'
-import { FirestoreDB } from '../../firebase/firebaseDB'
-import { NotificationsTypes, UserInfoTypes } from '../../types/index'
+import { FirestoreDB } from '../firebase/firebaseDB'
+import { IUserModel } from '../models/index'
 import * as Application from 'expo-application'
-import { uniqueId } from '../../utilities/generateUniqueId'
-import { generateDateTime } from '../../utilities/generateDateTime'
-import { RootContext } from '../../utilities/rootContext'
-import { ContextApiTypes } from '../../types/index'
+import { firebaseConfigs } from '../configs'
 
 type SignUpScreenPropsTypes = NativeStackScreenProps<RootParamList, 'SignUp'>
 
 export default function SignUpScreen({ navigation }: SignUpScreenPropsTypes) {
-  const { appInfo } = useContext<ContextApiTypes>(RootContext)
-
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [referralCode, setReferralCode] = useState('')
 
   const [errorInput, setErrorInput] = useState({
     inputName: '',
@@ -61,62 +52,6 @@ export default function SignUpScreen({ navigation }: SignUpScreenPropsTypes) {
   const handleSetPassword = (input: string) => {
     setPassword(input)
     setErrorInput({ inputName: '', isError: false, message: '' })
-  }
-
-  const handleSetReferralCode = (input: string) => {
-    setReferralCode(input)
-    setErrorInput({ inputName: '', isError: false, message: '' })
-  }
-
-  interface ValidateReferralCodeTypes {
-    referralCode: string
-    currentUserName: string
-  }
-
-  const validateReferralCode = async ({
-    referralCode,
-    currentUserName
-  }: ValidateReferralCodeTypes) => {
-    const userDB = new FirestoreDB('User')
-
-    const checkReferralCode = await userDB.queryCollection({
-      params_1: 'referralCode',
-      params_2: referralCode
-    })
-
-    console.log(checkReferralCode)
-
-    if (checkReferralCode.length === 0) throw Error('kode referral tidak ditemukan!')
-
-    const checkDeviceId = await userDB.queryCollection({
-      params_1: 'deviceId',
-      params_2: Application.androidId
-    })
-
-    console.log(checkDeviceId)
-
-    if (checkDeviceId.length !== 0)
-      throw Error(
-        'kode referral telah digunakan, kamu tidak bisa memakai kode referral lebih dari satu dalam satu device yang sama'
-      )
-
-    const documentIdUserReferrer = referralCode.split('-')[1]
-
-    const notification: NotificationsTypes = {
-      id: Date.now() + '',
-      message: `${currentUserName} telah menggunakan kode referral mu, selamat koin mu telah bertambah ${appInfo.payment.totalCoinReferral}`,
-      createdAt: generateDateTime()
-    }
-
-    const newData = {
-      coin: userDB.incrementValue(appInfo.payment.totalCoinReferral),
-      notifications: userDB.pushArray(notification)
-    }
-
-    await userDB.update({
-      documentId: documentIdUserReferrer,
-      newData: newData
-    })
   }
 
   const handleSubmit = async () => {
@@ -148,35 +83,20 @@ export default function SignUpScreen({ navigation }: SignUpScreenPropsTypes) {
         throw Error('gunakan password minimal 6 karakter!')
       }
 
-      if (referralCode !== '') {
-        inputName = 'referralCode'
-        await validateReferralCode({ referralCode: referralCode, currentUserName: name })
-      }
+      await createUserWithEmailAndPassword(firebaseConfigs.auth, email, password)
 
-      await createUserWithEmailAndPassword(auth, email, password)
-
-      const currentDateTime = new Date()
       const userDb = new FirestoreDB('User')
 
-      const userData: UserInfoTypes = {
-        name: name,
-        email: email.toLocaleLowerCase(),
-        password: password,
-        coin: appInfo.payment.totalFreeCoin || 0,
-        deviceId: Application.androidId + '',
-        referralCode: `${uniqueId()}-${email.toLocaleLowerCase()}`,
-        notifications: [
-          {
-            id: Date.now() + '',
-            message: `Hi ${name}.. selamat datang di Edufire`,
-            createdAt: currentDateTime.toDateString()
-          }
-        ],
-        waitingListTransaction: [],
-        transactionHistory: []
+      const userData: IUserModel = {
+        userName: name,
+        userEmail: email.toLocaleLowerCase(),
+        userPassword: password,
+        userDeviceId: Application.androidId + '',
+        userId: '',
+        userAuthentication: true
       }
 
-      await userDb.set({
+      await userDb.setDocument({
         documentId: email.toLocaleLowerCase(),
         data: userData
       })

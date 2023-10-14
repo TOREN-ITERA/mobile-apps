@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth'
 import { initializeFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 
-const firebaseConfig = {
+const connection = {
   apiKey: 'AIzaSyBr5A5kQ1Dak_VeVbEcJYeoCi_g8XUVmWU',
   authDomain: 'toren-itera.firebaseapp.com',
   projectId: 'toren-itera',
@@ -12,11 +12,15 @@ const firebaseConfig = {
   appId: '1:971511034983:web:4f67c76d98b8baa9fb50c2'
 }
 
-const app = initializeApp(firebaseConfig)
-
-export const DB = initializeFirestore(app, {
+const app = initializeApp(connection)
+const auth = getAuth(app)
+const storage = getStorage(app)
+const dataBase = initializeFirestore(app, {
   experimentalForceLongPolling: true
 })
 
-export const auth = getAuth(app)
-export const storage = getStorage(app)
+export const firebaseConfigs = {
+  dataBase,
+  auth,
+  storage
+}
