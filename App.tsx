@@ -9,6 +9,9 @@ import _ from 'lodash'
 import NotInternetAnimation from './apps/components/animations/Ofline'
 import 'expo-dev-client'
 import { AppProvider } from './apps/context/app.context'
+import { COLLECTION, IAppModel } from './apps/models'
+import { FirestoreDB } from './apps/firebase/firebaseDB'
+import MaintenanceAnimation from './apps/components/animations/Maintenance'
 
 LogBox.ignoreLogs(['Warning:...'])
 LogBox.ignoreAllLogs()
@@ -34,6 +37,7 @@ declare module 'native-base' {
 
 export default function App() {
   const [isOffline, setIsOffLine] = useState<any>(false)
+  const [appState, setAppState] = useState<IAppModel>()
 
   useEffect(() => {
     const removeNetInfoSubscription = NetInfo.addEventListener((state) => {
@@ -41,6 +45,17 @@ export default function App() {
       setIsOffLine(offline)
     })
     return () => removeNetInfoSubscription()
+  }, [])
+
+  const getAppState = async () => {
+    const appDB = new FirestoreDB(COLLECTION.APP)
+    const appData: IAppModel = await appDB.getDocument({
+      documentId: "appId"
+    })
+    setAppState(appData)
+  }
+  useEffect(() => {
+   getAppState()
   }, [])
 
   const [loaded] = useFonts({
@@ -52,7 +67,7 @@ export default function App() {
     return null
   }
 
-  // if (app?.appMaintenanceMode) return <MaintenanceAnimation />
+  if (appState?.appMaintenanceMode) return <MaintenanceAnimation />
 
   return (
     <NativeBaseProvider>

@@ -1,7 +1,7 @@
 {
 	"expo": {
-		"name": "edufire",
-		"slug": "UTBK",
+		"name": "Torantis",
+		"slug": "Torantis",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
@@ -23,7 +23,7 @@
 				"foregroundImage": "./assets/adaptive-icon.png",
 				"backgroundColor": "#1E90FF"
 			},
-			"package": "com.misdar.utbk"
+			"package": "com.misdar.torantis"
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"

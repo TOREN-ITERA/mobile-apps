@@ -4,33 +4,33 @@ import { View, Text } from "react-native";
 import { BASE_COLOR } from "../../utilities/baseColor";
 
 function EmptyAnimation({ title = "Tidak ditemukan" }: { title?: string }) {
-	return (
-		<View
-			style={{
-				flex: 1,
-				justifyContent: "center",
-				alignItems: "center",
-				backgroundColor: "#FFF",
-			}}
-		>
-			<LottieView
-				style={{ width: 200, height: 200 }}
-				source={require("../../../assets/animations/empty.json")}
-				autoPlay
-				loop={true}
-				duration={2000}
-			/>
-			<Text
-				style={{
-					textAlign: "center",
-					fontSize: 20,
-					color: BASE_COLOR.text.primary,
-				}}
-			>
-				{title}
-			</Text>
-		</View>
-	);
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#FFF",
+      }}
+    >
+      <LottieView
+        style={{ width: 200, height: 200 }}
+        source={require("../../../assets/animations/empty.json")}
+        autoPlay
+        loop={true}
+        duration={2000}
+      />
+      <Text
+        style={{
+          textAlign: "center",
+          fontSize: 20,
+          color: BASE_COLOR.text.primary,
+        }}
+      >
+        {title}
+      </Text>
+    </View>
+  );
 }
 
 export default EmptyAnimation;
