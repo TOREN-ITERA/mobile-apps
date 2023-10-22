@@ -1,38 +1,47 @@
 export enum COLLECTION {
-  USERS = 'USERS',
-  NOTIFICATIONS = 'NOTIFICATIONS',
-  DEVICES = 'DEVICES',
-  APP = 'APP'
+  USERS = "USERS",
+  NOTIFICATIONS = "NOTIFICATIONS",
+  DEVICES = "DEVICES",
+  HISTORY = "HISTORY",
+  APP = "APP",
 }
 
 export interface INotificationModel {
-  notificationId: string
-  notificationMessage: string
-  notificationCreatedAt: string
+  notificationId: string;
+  notificationMessage: string;
+  notificationCreatedAt: string;
 }
 
 export interface IDeviceModel {
-  deviceId: string
-  deviceName: string
-  deviceStatus: boolean
+  deviceId: string;
+  deviceStatus: boolean;
+  deviceWaterPumpStatus: boolean;
+  deviceElectricityStatus: boolean;
+  deviceInternetStatus: boolean;
 }
 
 export interface IUserModel {
-  userId: string
-  userAuthentication: boolean
-  userName: string
-  userEmail: string
-  userPassword: string
-  userDeviceId?: string
+  userId: string;
+  userAuthentication: boolean;
+  userName: string;
+  userEmail: string;
+  userPassword: string;
+  userDeviceId?: string;
 }
 
 export interface IAppModel {
-  appId: string
-  appMaintenanceMode: boolean
-  appVersion: number
+  appId: string;
+  appMaintenanceMode: boolean;
+  appVersion: number;
+}
+
+export interface IHistoryModel {
+  historyId: string;
+  historyMessage: string;
+  historyCreatedAt: string;
 }
 
 export interface IContextApiModel {
-  user: IUserModel
-  app: IAppModel
+  user: IUserModel;
+  app: IAppModel;
 }

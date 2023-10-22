@@ -19,11 +19,9 @@ import React, {
   useState,
 } from "react";
 import SkeletonHomeScreen from "../components/skeleton/HomeScreenSkeleton";
-import LottieView from "lottie-react-native";
-import { StyleSheet } from "react-native";
 import { useAppContext } from "../context/app.context";
 import { FirestoreDB } from "../firebase/firebaseDB";
-import { COLLECTION, IDeviceModel } from "../models";
+import { COLLECTION, IDeviceModel, IHistoryModel } from "../models";
 import {
   AntDesign,
   Feather,
@@ -38,26 +36,53 @@ type HomeScreenPropsTypes = NativeStackScreenProps<RootParamList, "Home">;
 export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
   const { currentUser } = useAppContext();
   const [isLoading, setIsLoading] = useState(true);
-  const [currentDevice, setCurrentDevice] = useState<IDeviceModel>();
-  const [controleDevice, setControleDevice] = useState(false);
-  const [waterPumpStatus, setWaterPumpStatus] = useState(false);
+  const [deviceStatus, setDeviceStatus] = useState<boolean>(false);
+  const [waterPumpStatus, setWaterPumpStatus] = useState<boolean>(false);
+  const [electricityStatus, setElectricityStatus] = useState<boolean>(false);
+  const [internetConnectionStatus, setInternetConnectionStatus] =
+    useState<boolean>(false);
+  const deviceDB = new FirestoreDB(COLLECTION.DEVICES);
+  const historyDB = new FirestoreDB(COLLECTION.HISTORY);
 
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 2000);
+    const unsub = deviceDB.getRealtimeData({
+      documentId: "device",
+      getData: (deviceData: IDeviceModel) => {
+        if (deviceData) {
+          setDeviceStatus(deviceData.deviceStatus);
+          setWaterPumpStatus(deviceData.deviceWaterPumpStatus);
+          setElectricityStatus(deviceData.deviceElectricityStatus);
+          setInternetConnectionStatus(deviceData.deviceInternetStatus);
+        }
+      },
+    });
+    setIsLoading(false);
+    return () => {
+      unsub();
+    };
   }, []);
 
-  const handleUpdateDeviceStatus = async () => {
-    const deviceDB = new FirestoreDB(COLLECTION.DEVICES);
-    const previousDevice = await deviceDB.getDocument({ documentId: "device" });
-    setControleDevice(!controleDevice);
+  const handleCreateHistory = async ({ message }: { message: string }) => {
+    const payload = {
+      historyMessage: message,
+      historyCreatedAt: Date.now() + "",
+    } as IHistoryModel;
 
-    if (previousDevice) {
-      await deviceDB.updateDocument({
-        documentId: "device",
-        newData: { deviceStatus: !controleDevice },
-      });
-      setCurrentDevice(previousDevice);
-    }
+    historyDB.setDocumentWithGeneratedId({
+      data: payload,
+    });
+  };
+
+  const handleUpdateDeviceStatus = async () => {
+    await deviceDB.updateDocument({
+      documentId: "device",
+      newData: {
+        deviceStatus: !deviceStatus,
+      },
+    });
+    await handleCreateHistory({
+      message: `pompa air ${deviceStatus ? "menyala" : "mati"}`,
+    });
   };
 
   useLayoutEffect(() => {
@@ -65,9 +90,9 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
       title: "",
       headerLeft: () => (
         <HStack px="2" alignItems="center" space={2}>
-          <Text color={BASE_COLOR.primary} fontSize="2xl">
+          <Heading color={BASE_COLOR.primary} fontSize="2xl">
             Torantis
-          </Text>
+          </Heading>
           <Feather name="droplet" size={24} color={BASE_COLOR.primary} />
         </HStack>
       ),
@@ -133,28 +158,23 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
               borderWidth={1}
               borderColor="gray.200"
               p={5}
-              h="48"
               bgColor="white"
               display="flex"
               alignItems="center"
               flexDirection="row"
             >
-              <LottieView
-                style={{
-                  width: widthPercentage(30),
-                  height: heightPercentage(15),
-                }}
-                source={require("../../assets/animations/water.json")}
-                autoPlay
-                loop={true}
-                duration={2000}
-              />
-              <Heading>{waterPumpStatus ? "Sedang Mengisi" : "Penuh"}</Heading>
+              <HStack space={4} alignItems="center">
+                <AntDesign name="message1" size={24} color="gray" />
+                <Text color="gray.500">
+                  {waterPumpStatus ? "Sedang Mengisi..." : "Penuh..."}
+                </Text>
+              </HStack>
             </Box>
             <HStack justifyContent="space-between" space={2}>
               <CardStyle
                 onClick={() => setWaterPumpStatus(!waterPumpStatus)}
                 status={waterPumpStatus}
+                title="water pump"
               >
                 <MaterialCommunityIcons
                   name="water-pump"
@@ -164,37 +184,42 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
               </CardStyle>
 
               <CardStyle
-                onClick={() => setWaterPumpStatus(!waterPumpStatus)}
-                status={waterPumpStatus}
+                onClick={() => setElectricityStatus(!electricityStatus)}
+                status={electricityStatus}
+                title="electricity"
               >
                 <Ionicons
                   name="flash"
                   size={24}
-                  color={waterPumpStatus ? "white" : "red"}
+                  color={electricityStatus ? "white" : "red"}
                 />
               </CardStyle>
             </HStack>
 
             <HStack justifyContent="space-between" space={2}>
               <CardStyle
-                onClick={() => setWaterPumpStatus(!waterPumpStatus)}
-                status={waterPumpStatus}
+                onClick={() =>
+                  setInternetConnectionStatus(!internetConnectionStatus)
+                }
+                status={internetConnectionStatus}
+                title="internet connection"
               >
                 <Entypo
                   name="signal"
                   size={24}
-                  color={waterPumpStatus ? "white" : "red"}
+                  color={internetConnectionStatus ? "white" : "red"}
                 />
               </CardStyle>
 
               <CardStyle
-                onClick={() => setWaterPumpStatus(!waterPumpStatus)}
-                status={waterPumpStatus}
+                onClick={handleUpdateDeviceStatus}
+                status={deviceStatus}
+                title={deviceStatus ? "on" : "off"}
               >
                 <AntDesign
                   name="poweroff"
                   size={24}
-                  color={waterPumpStatus ? "white" : "red"}
+                  color={deviceStatus ? "white" : "red"}
                 />
               </CardStyle>
             </HStack>
@@ -209,6 +234,7 @@ interface ICardStyleModel {
   onClick: (value: boolean) => void;
   status: boolean;
   children: React.FC<PropsWithChildren>;
+  title: string;
 }
 
 const CardStyle: any = (props: ICardStyleModel) => {
@@ -232,7 +258,7 @@ const CardStyle: any = (props: ICardStyleModel) => {
         >
           {props.children}
         </Box>
-        <Text mt="2">{props.status ? "ON" : "OFF"}</Text>
+        <Text mt="2">{props.title ?? "title"}</Text>
       </Box>
     </Pressable>
   );
