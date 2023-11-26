@@ -30,6 +30,7 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { heightPercentage, widthPercentage } from "../utilities/dimension";
+import LottieView from "lottie-react-native";
 
 type HomeScreenPropsTypes = NativeStackScreenProps<RootParamList, "Home">;
 
@@ -153,24 +154,25 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
             <RefreshControl refreshing={isLoading} onRefresh={() => {}} />
           }
         >
-          <VStack space={2} my={2}>
-            <Box
-              borderWidth={1}
-              borderColor="gray.200"
-              p={5}
-              bgColor="white"
-              display="flex"
-              alignItems="center"
-              flexDirection="row"
-            >
-              <HStack space={4} alignItems="center">
-                <AntDesign name="message1" size={24} color="gray" />
-                <Text color="gray.500">
-                  {waterPumpStatus ? "Sedang Mengisi..." : "Penuh..."}
-                </Text>
-              </HStack>
-            </Box>
-            <HStack justifyContent="space-between" space={2}>
+          <ScrollView
+            showsHorizontalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={isLoading} onRefresh={() => {}} />
+            }
+            horizontal
+          >
+            <HStack justifyContent="space-between" space={2} my={5}>
+              <CardStyle
+                onClick={handleUpdateDeviceStatus}
+                status={deviceStatus}
+                title={deviceStatus ? "on" : "off"}
+              >
+                <AntDesign
+                  name="poweroff"
+                  size={24}
+                  color={deviceStatus ? "white" : "red"}
+                />
+              </CardStyle>
               <CardStyle
                 onClick={() => setWaterPumpStatus(!waterPumpStatus)}
                 status={waterPumpStatus}
@@ -182,7 +184,6 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
                   color={waterPumpStatus ? "white" : "red"}
                 />
               </CardStyle>
-
               <CardStyle
                 onClick={() => setElectricityStatus(!electricityStatus)}
                 status={electricityStatus}
@@ -194,9 +195,6 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
                   color={electricityStatus ? "white" : "red"}
                 />
               </CardStyle>
-            </HStack>
-
-            <HStack justifyContent="space-between" space={2}>
               <CardStyle
                 onClick={() =>
                   setInternetConnectionStatus(!internetConnectionStatus)
@@ -210,20 +208,22 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
                   color={internetConnectionStatus ? "white" : "red"}
                 />
               </CardStyle>
-
-              <CardStyle
-                onClick={handleUpdateDeviceStatus}
-                status={deviceStatus}
-                title={deviceStatus ? "on" : "off"}
-              >
-                <AntDesign
-                  name="poweroff"
-                  size={24}
-                  color={deviceStatus ? "white" : "red"}
-                />
-              </CardStyle>
             </HStack>
-          </VStack>
+          </ScrollView>
+
+          <Box
+            borderWidth={1}
+            borderColor="gray.200"
+            rounded="xl"
+            backgroundColor="blue.200"
+            p={5}
+            h={heightPercentage(20)}
+            bgColor="white"
+            width={widthPercentage(96)}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          ></Box>
         </ScrollView>
       )}
     </Layout>
@@ -244,9 +244,10 @@ const CardStyle: any = (props: ICardStyleModel) => {
         borderWidth={1}
         borderColor="gray.200"
         p={5}
-        h={heightPercentage(30)}
+        h={heightPercentage(20)}
         bgColor="white"
-        width={widthPercentage(47)}
+        rounded="xl"
+        width={widthPercentage(40)}
         display="flex"
         justifyContent="center"
         alignItems="center"

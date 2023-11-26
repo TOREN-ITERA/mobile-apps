@@ -9,6 +9,13 @@ import ListSkeleton from "../components/skeleton/ListSkeleton";
 import { useAppContext } from "../context/app.context";
 import { COLLECTION, INotificationModel } from "../models";
 import { FirestoreDB } from "../firebase/firebaseDB";
+import Animated, {
+  useSharedValue,
+  withTiming,
+  useAnimatedStyle,
+  Easing,
+} from "react-native-reanimated";
+import { View, Button, StyleSheet } from "react-native";
 
 type NotificationScreenPropsTypes = NativeStackScreenProps<
   RootParamList,
@@ -21,6 +28,19 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
     INotificationModel[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const randomWidth = useSharedValue(10);
+
+  const config = {
+    duration: 500,
+    easing: Easing.bezier(0.5, 0.01, 0, 1),
+  };
+
+  const style = useAnimatedStyle(() => {
+    return {
+      width: withTiming(randomWidth.value, config),
+    };
+  });
 
   useEffect(() => {
     (async () => {
@@ -38,7 +58,7 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
 
   return (
     <Layout>
-      {notificationList.length === 0 && (
+      {/* {notificationList.length === 0 && (
         <EmptyAnimation title="Belum ada notifikasi" />
       )}
       {notificationList.length !== 0 && (
@@ -68,9 +88,34 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
             </VStack>
           )}
         />
-      )}
+      )} */}
+
+      <View style={styles.container}>
+        <Animated.View style={[styles.box, style]} />
+        <Button
+          title="toggle"
+          onPress={() => {
+            randomWidth.value = Math.random() * 350;
+          }}
+        />
+      </View>
     </Layout>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "column",
+  },
+  box: {
+    width: 10,
+    height: 80,
+    backgroundColor: "black",
+    margin: 30,
+  },
+});
 
 export default NotificationScreen;
