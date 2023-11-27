@@ -62,7 +62,7 @@ function TabNavigation() {
     >
       <Tab.Screen
         name="Home"
-        options={{ tabBarLabel: "Beranda" }}
+        options={{ tabBarLabel: "Home" }}
         component={HomeScreen}
       />
       <Tab.Screen

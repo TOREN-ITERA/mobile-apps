@@ -1,13 +1,5 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import {
-  HStack,
-  Text,
-  ScrollView,
-  Pressable,
-  Box,
-  VStack,
-  Heading,
-} from "native-base";
+import { HStack, Text, ScrollView, Pressable, Box, Heading } from "native-base";
 import Layout from "../components/Layout";
 import { RootParamList } from "../navigations";
 import { RefreshControl } from "react-native";
@@ -30,7 +22,7 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { heightPercentage, widthPercentage } from "../utilities/dimension";
-import LottieView from "lottie-react-native";
+import CircularProgress from "react-native-circular-progress-indicator";
 
 type HomeScreenPropsTypes = NativeStackScreenProps<RootParamList, "Home">;
 
@@ -64,9 +56,10 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
   }, []);
 
   const handleCreateHistory = async ({ message }: { message: string }) => {
+    const date = new Date();
     const payload = {
       historyMessage: message,
-      historyCreatedAt: Date.now() + "",
+      historyCreatedAt: date.toLocaleString(),
     } as IHistoryModel;
 
     historyDB.setDocumentWithGeneratedId({
@@ -154,13 +147,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
             <RefreshControl refreshing={isLoading} onRefresh={() => {}} />
           }
         >
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl refreshing={isLoading} onRefresh={() => {}} />
-            }
-            horizontal
-          >
+          <ScrollView showsHorizontalScrollIndicator={false} horizontal>
             <HStack justifyContent="space-between" space={2} my={5}>
               <CardStyle
                 onClick={handleUpdateDeviceStatus}
@@ -217,13 +204,20 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
             rounded="xl"
             backgroundColor="blue.200"
             p={5}
-            h={heightPercentage(20)}
+            h={heightPercentage(50)}
             bgColor="white"
             width={widthPercentage(96)}
             display="flex"
             justifyContent="center"
             alignItems="center"
-          ></Box>
+          >
+            <CircularProgress
+              value={58}
+              progressValueColor={BASE_COLOR.primary}
+              activeStrokeColor={BASE_COLOR.primary}
+              valueSuffix={"%"}
+            />
+          </Box>
         </ScrollView>
       )}
     </Layout>
