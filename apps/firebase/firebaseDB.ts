@@ -11,6 +11,8 @@ import {
   arrayRemove,
   arrayUnion,
   onSnapshot,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 import { firebaseConfigs } from "../configs";
 
@@ -153,5 +155,20 @@ export class FirestoreDB {
       console.log("Current data: ", doc.data());
     });
     return unsub;
+  }
+
+  public async getDocumentWithPagination() {
+    try {
+      const collectionPath = this.getCollectionPath();
+      const first = query(collectionPath, orderBy("population"), limit(25));
+
+      const documentSnapshots = await getDocs(first);
+      const lastVisible =
+        documentSnapshots.docs[documentSnapshots.docs.length - 1];
+      console.log("last", lastVisible);
+    } catch (error: any) {
+      console.log(error);
+      return error;
+    }
   }
 }

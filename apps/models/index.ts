@@ -18,6 +18,7 @@ export interface IDeviceModel {
   deviceWaterPumpStatus: boolean;
   deviceElectricityStatus: boolean;
   deviceInternetStatus: boolean;
+  deviceWaterPumpProgress: number;
 }
 
 export interface IUserModel {

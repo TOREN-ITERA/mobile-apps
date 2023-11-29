@@ -17,9 +17,6 @@ export default function ProfileScreen({ navigation }: ProfilePropsTypes) {
   const { currentUser, appState } = useAppContext();
   const [openModal, setOpenModal] = useState(false);
 
-  console.log("cu");
-  console.log(currentUser);
-
   const handleLogOut = async () => {
     await signOut(firebaseConfigs.auth);
   };
@@ -52,7 +49,7 @@ export default function ProfileScreen({ navigation }: ProfilePropsTypes) {
           <Text color={BASE_COLOR.text.primary}>{currentUser.userEmail}</Text>
         </VStack>
       </VStack>
-      <CardProfileList onPress={() => setOpenModal(true)}>
+      <CardProfileList onPress={() => null}>
         <AntDesign name="setting" size={24} color={BASE_COLOR.text.primary} />
         <Text fontSize="md" fontWeight="bold" color={BASE_COLOR.text.primary}>
           Settings

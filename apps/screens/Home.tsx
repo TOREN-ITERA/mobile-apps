@@ -34,6 +34,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
   const [electricityStatus, setElectricityStatus] = useState<boolean>(false);
   const [internetConnectionStatus, setInternetConnectionStatus] =
     useState<boolean>(false);
+  const [waterPumpProgress, setWaterPumpProgress] = useState<number>(0);
   const deviceDB = new FirestoreDB(COLLECTION.DEVICES);
   const historyDB = new FirestoreDB(COLLECTION.HISTORY);
 
@@ -46,6 +47,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
           setWaterPumpStatus(deviceData.deviceWaterPumpStatus);
           setElectricityStatus(deviceData.deviceElectricityStatus);
           setInternetConnectionStatus(deviceData.deviceInternetStatus);
+          setWaterPumpProgress(deviceData.deviceWaterPumpProgress ?? 0);
         }
       },
     });
@@ -74,6 +76,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
         deviceStatus: !deviceStatus,
       },
     });
+
     await handleCreateHistory({
       message: `pompa air ${deviceStatus ? "menyala" : "mati"}`,
     });
@@ -212,11 +215,14 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
             alignItems="center"
           >
             <CircularProgress
-              value={58}
+              value={waterPumpProgress}
               progressValueColor={BASE_COLOR.primary}
               activeStrokeColor={BASE_COLOR.primary}
               valueSuffix={"%"}
             />
+            <Text mt={5} color={BASE_COLOR.primary}>
+              1 hour and 22 minutes left
+            </Text>
           </Box>
         </ScrollView>
       )}
