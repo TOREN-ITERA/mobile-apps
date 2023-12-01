@@ -1,40 +1,42 @@
 {
-	"expo": {
-		"name": "Torantis",
-		"slug": "Torantis",
-		"version": "1.0.0",
-		"orientation": "portrait",
-		"icon": "./assets/icon.png",
-		"splash": {
-			"image": "./assets/splash.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#1E90FF"
-		},
-		"updates": {
-			"fallbackToCacheTimeout": 0
-		},
-		"assetBundlePatterns": ["**/*"],
-		"ios": {
-			"supportsTablet": true
-		},
-		"android": {
-			"versionCode": 16,
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/adaptive-icon.png",
-				"backgroundColor": "#1E90FF"
-			},
-			"package": "com.misdar.torantis"
-		},
-		"web": {
-			"favicon": "./assets/favicon.png"
-		},
-		"extra": {
-			"eas": {
-				"projectId": ""
-			}
-		}
-	},
-	"react-native-google-mobile-ads": {
-		"android_app_id": ""
-	}
+  "expo": {
+    "name": "Torantis",
+    "slug": "Torantis",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1E90FF"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "versionCode": 16,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1E90FF"
+      },
+      "package": "com.misdar.torantis"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "861f611d-d74d-4854-9494-f0dcc3c511da"
+      }
+    }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": ""
+  }
 }
