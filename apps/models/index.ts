@@ -13,12 +13,15 @@ export interface INotificationModel {
 }
 
 export interface IDeviceModel {
+  deviceWaterFlowProgress: number;
+  deviceCurrentSensor: number;
+  // deviceElectricityStatus: boolean;
   deviceId: string;
-  deviceStatus: boolean;
-  deviceWaterPumpStatus: boolean;
-  deviceElectricityStatus: boolean;
   deviceInternetStatus: boolean;
+  deviceStatus: boolean;
+  deviceWaterLevelStatus: boolean;
   deviceWaterPumpProgress: number;
+  deviceWaterPumpStatus: boolean;
 }
 
 export interface IUserModel {

@@ -1,5 +1,13 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { HStack, Text, ScrollView, Pressable, Box, Heading } from "native-base";
+import {
+  HStack,
+  Text,
+  ScrollView,
+  Pressable,
+  Box,
+  Heading,
+  VStack,
+} from "native-base";
 import Layout from "../components/Layout";
 import { RootParamList } from "../navigations";
 import { RefreshControl } from "react-native";
@@ -35,6 +43,10 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
   const [internetConnectionStatus, setInternetConnectionStatus] =
     useState<boolean>(false);
   const [waterPumpProgress, setWaterPumpProgress] = useState<number>(0);
+  const [deviceCurrentSensor, setDeviceCurrentSensor] = useState<number>(0);
+  const [deviceWaterFlowProgress, setDeviceWaterFlowProgress] =
+    useState<number>(0);
+
   const deviceDB = new FirestoreDB(COLLECTION.DEVICES);
   const historyDB = new FirestoreDB(COLLECTION.HISTORY);
 
@@ -45,9 +57,10 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
         if (deviceData) {
           setDeviceStatus(deviceData.deviceStatus);
           setWaterPumpStatus(deviceData.deviceWaterPumpStatus);
-          setElectricityStatus(deviceData.deviceElectricityStatus);
           setInternetConnectionStatus(deviceData.deviceInternetStatus);
           setWaterPumpProgress(deviceData.deviceWaterPumpProgress ?? 0);
+          setDeviceCurrentSensor(deviceData.deviceCurrentSensor);
+          setDeviceWaterFlowProgress(deviceData.deviceWaterFlowProgress);
         }
       },
     });
@@ -150,6 +163,27 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
             <RefreshControl refreshing={isLoading} onRefresh={() => {}} />
           }
         >
+          <Box
+            borderWidth={1}
+            borderColor="gray.200"
+            rounded="xl"
+            backgroundColor="blue.200"
+            p={2}
+            bgColor="white"
+            width={widthPercentage(96)}
+            display="flex"
+            marginTop={heightPercentage(1)}
+          >
+            <HStack padding={1}>
+              <Ionicons name="flash" size={24} color={BASE_COLOR.blue[200]} />
+              <Text>current sensor : {deviceCurrentSensor}</Text>
+            </HStack>
+            <HStack padding={1}>
+              <Ionicons name="flash" size={24} color={BASE_COLOR.blue[200]} />
+              <Text>water flow progress : {deviceWaterFlowProgress}</Text>
+            </HStack>
+          </Box>
+
           <ScrollView showsHorizontalScrollIndicator={false} horizontal>
             <HStack justifyContent="space-between" space={2} my={5}>
               <CardStyle
@@ -174,17 +208,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
                   color={waterPumpStatus ? "white" : "red"}
                 />
               </CardStyle>
-              <CardStyle
-                onClick={() => setElectricityStatus(!electricityStatus)}
-                status={electricityStatus}
-                title="electricity"
-              >
-                <Ionicons
-                  name="flash"
-                  size={24}
-                  color={electricityStatus ? "white" : "red"}
-                />
-              </CardStyle>
+
               <CardStyle
                 onClick={() =>
                   setInternetConnectionStatus(!internetConnectionStatus)

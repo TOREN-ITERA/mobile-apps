@@ -1,21 +1,23 @@
-import { FlatList, HStack, Text, VStack } from "native-base";
-import Layout from "../components/Layout";
+import React, { useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Button, HStack, Text, VStack } from "native-base";
+import Layout from "../components/Layout";
 import { RootParamList } from "../navigations";
-import { useEffect, useState } from "react";
 import { BASE_COLOR } from "../utilities/baseColor";
+import { FlatList, RefreshControl } from "react-native";
 import EmptyAnimation from "../components/animations/Empty";
-import ListSkeleton from "../components/skeleton/ListSkeleton";
-import { useAppContext } from "../context/app.context";
-import { COLLECTION, INotificationModel } from "../models";
+import { COLLECTION, IHistoryModel } from "../models";
 import { FirestoreDB } from "../firebase/firebaseDB";
-import Animated, {
-  useSharedValue,
-  withTiming,
-  useAnimatedStyle,
-  Easing,
-} from "react-native-reanimated";
-import { View, Button, StyleSheet } from "react-native";
+import ListSkeleton from "../components/skeleton/ListSkeleton";
+import {
+  collection,
+  query,
+  orderBy,
+  startAfter,
+  limit,
+  getDocs,
+} from "firebase/firestore";
+import { firebaseConfigs } from "../configs";
 
 type NotificationScreenPropsTypes = NativeStackScreenProps<
   RootParamList,
@@ -23,48 +25,93 @@ type NotificationScreenPropsTypes = NativeStackScreenProps<
 >;
 
 const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
-  const { currentUser } = useAppContext();
-  const [notificationList, setNotificationList] = useState<
-    INotificationModel[]
-  >([]);
+  const [historyList, setHistoryList] = useState<IHistoryModel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const randomWidth = useSharedValue(10);
+  const [lastVisibleData, setlastVisibleData] = useState<any>();
 
-  const config = {
-    duration: 500,
-    easing: Easing.bezier(0.5, 0.01, 0, 1),
+  const getFirstDocument = async () => {
+    const first = query(
+      collection(firebaseConfigs.dataBase, COLLECTION.HISTORY),
+      orderBy("historyCreatedAt"),
+      limit(2)
+    );
+
+    const data: any[] = [];
+    const documentSnapshots = await getDocs(first);
+    documentSnapshots.forEach((doc: any) => {
+      data.push({ ...doc.data(), id: doc.id });
+    });
+
+    const lastVisible =
+      documentSnapshots.docs[documentSnapshots.docs.length - 1];
+    console.log(lastVisible);
+    // console.log(data);
+    setlastVisibleData(lastVisible);
   };
 
-  const style = useAnimatedStyle(() => {
-    return {
-      width: withTiming(randomWidth.value, config),
-    };
-  });
+  const getNextDocument = async () => {
+    const next = query(
+      collection(firebaseConfigs.dataBase, COLLECTION.HISTORY),
+      orderBy("historyCreatedAt"),
+      startAfter(lastVisibleData),
+      limit(5)
+    );
+
+    const data: any[] = [];
+    const documentSnapshots = await getDocs(next);
+    documentSnapshots.forEach((doc: any) => {
+      data.push({ ...doc.data(), id: doc.id });
+    });
+
+    const lastVisible =
+      documentSnapshots.docs[documentSnapshots.docs.length - 1];
+    console.log("last", lastVisible);
+    // console.log(data);
+    setlastVisibleData(lastVisible);
+  };
+
+  const getHistory = async () => {
+    const historyDb = new FirestoreDB(COLLECTION.HISTORY);
+    const result = await historyDb.getDocumentCollection();
+    if (result) {
+      setHistoryList(result);
+    }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
-    (async () => {
-      const notifications = new FirestoreDB(COLLECTION.NOTIFICATIONS);
-      const getNotification = await notifications.getDocumentCollection();
-
-      if (getNotification) {
-        setNotificationList(getNotification);
-      }
-      setIsLoading(false);
-    })();
+    getHistory();
   }, []);
 
   if (isLoading) return <ListSkeleton />;
 
   return (
     <Layout>
-      {/* {notificationList.length === 0 && (
+      {historyList.length === 0 && (
         <EmptyAnimation title="Belum ada notifikasi" />
       )}
-      {notificationList.length !== 0 && (
+      {historyList.length !== 0 && (
         <FlatList
-          data={notificationList}
-          keyExtractor={(item) => item.notificationId}
+          data={historyList}
+          keyExtractor={(item) => item.historyId}
+          refreshControl={
+            <RefreshControl refreshing={isLoading} onRefresh={getHistory} />
+          }
+          ListFooterComponent={() => (
+            <HStack
+              backgroundColor="white"
+              p="5"
+              my="1"
+              borderWidth="1"
+              borderColor="gray.200"
+              justifyContent="space-between"
+            >
+              <Button>Previous</Button>
+              <Button onPress={getFirstDocument}>start</Button>
+              <Button onPress={getNextDocument}>Next</Button>
+            </HStack>
+          )}
           renderItem={({ item }) => (
             <VStack
               backgroundColor={"#FFF"}
@@ -77,45 +124,20 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
             >
               <HStack>
                 <Text fontSize="16" color={BASE_COLOR.text.primary}>
-                  {item.notificationMessage}
+                  {item.historyMessage}
                 </Text>
               </HStack>
               <HStack justifyContent="flex-end">
                 <Text fontSize="11" color={BASE_COLOR.text.primary}>
-                  {item.notificationCreatedAt.toString()}
+                  {item.historyCreatedAt.toString()}
                 </Text>
               </HStack>
             </VStack>
           )}
         />
-      )} */}
-
-      <View style={styles.container}>
-        <Animated.View style={[styles.box, style]} />
-        <Button
-          title="toggle"
-          onPress={() => {
-            randomWidth.value = Math.random() * 350;
-          }}
-        />
-      </View>
+      )}
     </Layout>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "column",
-  },
-  box: {
-    width: 10,
-    height: 80,
-    backgroundColor: "black",
-    margin: 30,
-  },
-});
 
 export default NotificationScreen;

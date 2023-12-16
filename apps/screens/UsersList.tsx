@@ -67,9 +67,9 @@ export default function UsersListScreen({ navigation }: UserListPropsTypes) {
                       {item.userName}
                     </Heading>
                   </HStack>
-                  <HStack justifyContent="flex-end">
+                  <HStack>
                     <Text fontSize="11" color={BASE_COLOR.text.primary}>
-                      {item.userEmail}
+                      {item.userEmail.trim()}
                     </Text>
                   </HStack>
                 </VStack>
