@@ -15,7 +15,7 @@ export interface INotificationModel {
 export interface IDeviceModel {
   deviceWaterFlowProgress: number;
   deviceCurrentSensor: number;
-  // deviceElectricityStatus: boolean;
+  deviceConnectionType: string;
   deviceId: string;
   deviceInternetStatus: boolean;
   deviceStatus: boolean;

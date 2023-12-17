@@ -21,7 +21,7 @@ import React, {
 import SkeletonHomeScreen from "../components/skeleton/HomeScreenSkeleton";
 import { useAppContext } from "../context/app.context";
 import { FirestoreDB } from "../firebase/firebaseDB";
-import { COLLECTION, IDeviceModel, IHistoryModel } from "../models";
+import { COLLECTION, IDeviceModel, IHistoryModel, IUserModel } from "../models";
 import {
   AntDesign,
   Feather,
@@ -39,18 +39,30 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
   const [isLoading, setIsLoading] = useState(true);
   const [deviceStatus, setDeviceStatus] = useState<boolean>(false);
   const [waterPumpStatus, setWaterPumpStatus] = useState<boolean>(false);
-  const [electricityStatus, setElectricityStatus] = useState<boolean>(false);
   const [internetConnectionStatus, setInternetConnectionStatus] =
     useState<boolean>(false);
   const [waterPumpProgress, setWaterPumpProgress] = useState<number>(0);
   const [deviceCurrentSensor, setDeviceCurrentSensor] = useState<number>(0);
   const [deviceWaterFlowProgress, setDeviceWaterFlowProgress] =
     useState<number>(0);
+  const [totalUser, setTotalUser] = useState<number>(0);
+  const [deviceConnectionType, setDeviceConnectionType] =
+    useState<string>("Loading...");
 
   const deviceDB = new FirestoreDB(COLLECTION.DEVICES);
   const historyDB = new FirestoreDB(COLLECTION.HISTORY);
 
+  const getUsers = async () => {
+    const historyDb = new FirestoreDB(COLLECTION.USERS);
+    const result = await historyDb.getDocumentCollection();
+    if (result) {
+      setTotalUser(result.length);
+    }
+    setIsLoading(false);
+  };
+
   useEffect(() => {
+    getUsers();
     const unsub = deviceDB.getRealtimeData({
       documentId: "device",
       getData: (deviceData: IDeviceModel) => {
@@ -61,6 +73,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
           setWaterPumpProgress(deviceData.deviceWaterPumpProgress ?? 0);
           setDeviceCurrentSensor(deviceData.deviceCurrentSensor);
           setDeviceWaterFlowProgress(deviceData.deviceWaterFlowProgress);
+          setDeviceConnectionType(deviceData.deviceConnectionType);
         }
       },
     });
@@ -163,6 +176,9 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
             <RefreshControl refreshing={isLoading} onRefresh={() => {}} />
           }
         >
+          <Text fontWeight="bold" color={"gray.500"}>
+            Summary
+          </Text>
           <Box
             borderWidth={1}
             borderColor="gray.200"
@@ -172,20 +188,60 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
             bgColor="white"
             width={widthPercentage(96)}
             display="flex"
-            marginTop={heightPercentage(1)}
+            flexWrap="wrap"
           >
-            <HStack padding={1}>
-              <Ionicons name="flash" size={24} color={BASE_COLOR.blue[200]} />
-              <Text>current sensor : {deviceCurrentSensor}</Text>
+            <HStack padding={1} space={2} alignItems={"center"}>
+              <HStack padding={1} space={2} alignItems={"center"}>
+                <Box bg={"blue.100"} rounded="full" p={1}>
+                  <Ionicons
+                    name="flash"
+                    size={20}
+                    color={BASE_COLOR.blue[200]}
+                  />
+                </Box>
+                <Text>current {deviceCurrentSensor}</Text>
+              </HStack>
+              <HStack padding={1} space={2} alignItems={"center"}>
+                <Box bg={"blue.100"} rounded="full" p={1}>
+                  <AntDesign
+                    name="dashboard"
+                    size={20}
+                    color={BASE_COLOR.blue[200]}
+                  />
+                </Box>
+                <Text>water flow {deviceWaterFlowProgress}</Text>
+              </HStack>
+              <HStack padding={1} space={2} alignItems={"center"}>
+                <Box bg={"blue.100"} rounded="full" p={1}>
+                  <Feather
+                    name="users"
+                    size={20}
+                    color={BASE_COLOR.blue[200]}
+                  />
+                </Box>
+                <Text>users {totalUser}</Text>
+              </HStack>
             </HStack>
-            <HStack padding={1}>
-              <Ionicons name="flash" size={24} color={BASE_COLOR.blue[200]} />
-              <Text>water flow progress : {deviceWaterFlowProgress}</Text>
+
+            <HStack padding={1} space={2} alignItems={"center"}>
+              <HStack padding={1} space={2} alignItems={"center"}>
+                <Box bg={"blue.100"} rounded="full" p={1}>
+                  <Entypo
+                    name="signal"
+                    size={18}
+                    color={BASE_COLOR.blue[200]}
+                  />
+                </Box>
+                <Text>{deviceConnectionType}</Text>
+              </HStack>
             </HStack>
           </Box>
 
-          <ScrollView showsHorizontalScrollIndicator={false} horizontal>
-            <HStack justifyContent="space-between" space={2} my={5}>
+          <Text fontWeight="bold" color={"gray.500"}>
+            Control
+          </Text>
+          <ScrollView showsHorizontalScrollIndicator={false} horizontal my={2}>
+            <HStack justifyContent="space-between" space={2}>
               <CardStyle
                 onClick={handleUpdateDeviceStatus}
                 status={deviceStatus}
@@ -214,7 +270,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
                   setInternetConnectionStatus(!internetConnectionStatus)
                 }
                 status={internetConnectionStatus}
-                title="internet connection"
+                title="connection"
               >
                 <Entypo
                   name="signal"
@@ -224,14 +280,17 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
               </CardStyle>
             </HStack>
           </ScrollView>
-
+          <Text fontWeight="bold" color={"gray.500"}>
+            Progress
+          </Text>
           <Box
             borderWidth={1}
+            my={2}
             borderColor="gray.200"
             rounded="xl"
             backgroundColor="blue.200"
             p={5}
-            h={heightPercentage(50)}
+            h={heightPercentage(45)}
             bgColor="white"
             width={widthPercentage(96)}
             display="flex"
