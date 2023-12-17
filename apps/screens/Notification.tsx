@@ -45,8 +45,6 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
 
     const lastVisible =
       documentSnapshots.docs[documentSnapshots.docs.length - 1];
-    console.log(lastVisible);
-    // console.log(data);
     setlastVisibleData(lastVisible);
   };
 
@@ -66,8 +64,6 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
 
     const lastVisible =
       documentSnapshots.docs[documentSnapshots.docs.length - 1];
-    console.log("last", lastVisible);
-    // console.log(data);
     setlastVisibleData(lastVisible);
   };
 

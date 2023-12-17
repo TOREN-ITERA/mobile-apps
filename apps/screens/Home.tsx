@@ -1,13 +1,5 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import {
-  HStack,
-  Text,
-  ScrollView,
-  Pressable,
-  Box,
-  Heading,
-  VStack,
-} from "native-base";
+import { HStack, Text, ScrollView, Pressable, Box, Heading } from "native-base";
 import Layout from "../components/Layout";
 import { RootParamList } from "../navigations";
 import { RefreshControl } from "react-native";
@@ -21,7 +13,7 @@ import React, {
 import SkeletonHomeScreen from "../components/skeleton/HomeScreenSkeleton";
 import { useAppContext } from "../context/app.context";
 import { FirestoreDB } from "../firebase/firebaseDB";
-import { COLLECTION, IDeviceModel, IHistoryModel, IUserModel } from "../models";
+import { COLLECTION, IDeviceModel, IHistoryModel } from "../models";
 import {
   AntDesign,
   Feather,
