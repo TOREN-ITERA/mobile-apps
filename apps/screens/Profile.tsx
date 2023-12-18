@@ -15,6 +15,8 @@ type ProfilePropsTypes = NativeStackScreenProps<RootParamList, "Profile">;
 
 export default function ProfileScreen({ navigation }: ProfilePropsTypes) {
   const { currentUser, appState } = useAppContext();
+
+  console.log(currentUser);
   const [openModal, setOpenModal] = useState(false);
 
   const handleLogOut = async () => {

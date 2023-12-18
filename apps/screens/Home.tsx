@@ -1,5 +1,16 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { HStack, Text, ScrollView, Pressable, Box, Heading } from "native-base";
+import {
+  HStack,
+  Text,
+  ScrollView,
+  Pressable,
+  Box,
+  Heading,
+  Modal,
+  FormControl,
+  Input,
+  Button,
+} from "native-base";
 import Layout from "../components/Layout";
 import { RootParamList } from "../navigations";
 import { RefreshControl } from "react-native";
@@ -23,6 +34,7 @@ import {
 } from "@expo/vector-icons";
 import { heightPercentage, widthPercentage } from "../utilities/dimension";
 import CircularProgress from "react-native-circular-progress-indicator";
+import ModalPrimary from "../components/Modal/ModalPrimary";
 
 type HomeScreenPropsTypes = NativeStackScreenProps<RootParamList, "Home">;
 
@@ -40,6 +52,10 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
   const [totalUser, setTotalUser] = useState<number>(0);
   const [deviceConnectionType, setDeviceConnectionType] =
     useState<string>("Loading...");
+
+  const [showModalPasswordVerification, setShowModalPasswordVerification] =
+    useState(false);
+  const [passwordVerification, setPasswordVerification] = useState<string>("");
 
   const deviceDB = new FirestoreDB(COLLECTION.DEVICES);
   const historyDB = new FirestoreDB(COLLECTION.HISTORY);
@@ -88,6 +104,12 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
   };
 
   const handleUpdateDeviceStatus = async () => {
+    if (deviceStatus === true) {
+      if (passwordVerification !== currentUser.userPassword) {
+        return;
+      }
+    }
+
     await deviceDB.updateDocument({
       documentId: "device",
       newData: {
@@ -235,7 +257,15 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
           <ScrollView showsHorizontalScrollIndicator={false} horizontal my={2}>
             <HStack justifyContent="space-between" space={2}>
               <CardStyle
-                onClick={handleUpdateDeviceStatus}
+                onClick={() => {
+                  if (deviceStatus === true) {
+                    setShowModalPasswordVerification(
+                      !showModalPasswordVerification
+                    );
+                  } else {
+                    handleUpdateDeviceStatus();
+                  }
+                }}
                 status={deviceStatus}
                 title={deviceStatus ? "on" : "off"}
               >
@@ -301,6 +331,46 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
           </Box>
         </ScrollView>
       )}
+
+      <Modal
+        isOpen={showModalPasswordVerification}
+        onClose={() => setShowModalPasswordVerification(false)}
+      >
+        <Modal.Content maxWidth="400px">
+          <Modal.CloseButton />
+          <Modal.Header>Verification</Modal.Header>
+          <Modal.Body>
+            <FormControl>
+              <FormControl.Label>Password</FormControl.Label>
+              <Input
+                type="password"
+                onChangeText={(value) => setPasswordVerification(value)}
+              />
+            </FormControl>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button.Group space={2}>
+              <Button
+                variant="ghost"
+                colorScheme="blueGray"
+                onPress={() => {
+                  setShowModalPasswordVerification(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onPress={() => {
+                  handleUpdateDeviceStatus();
+                  setShowModalPasswordVerification(false);
+                }}
+              >
+                Submit
+              </Button>
+            </Button.Group>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
     </Layout>
   );
 }
