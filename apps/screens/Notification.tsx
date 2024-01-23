@@ -31,6 +31,7 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
   const [lastVisibleData, setlastVisibleData] = useState<any>();
 
   const [filterBy, setFilterBy] = useState("");
+  const [search, setSearch] = useState("");
 
   const getFirstDocument = async () => {
     const first = query(
@@ -82,8 +83,12 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
     getHistory();
   }, []);
 
-  useEffect(() => {
+  const getData = async () => {
     console.log("get data");
+  };
+
+  useEffect(() => {
+    getData();
   }, [filterBy]);
 
   if (isLoading) return <ListSkeleton />;
@@ -94,14 +99,6 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
         <EmptyAnimation title="Belum ada notifikasi" />
       )}
 
-      {/* <HStack space={3}>
-        {[1, 2].map((item) => (
-          <CardSkeleton key={item} />
-        ))}
-      </HStack>
-
-      <CardListSkeleton /> */}
-
       {historyList.length !== 0 && (
         <FlatList
           data={historyList}
@@ -109,10 +106,29 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
           ListHeaderComponent={() => (
             <Box>
               <Input
-                mt={2}
-                placeholder="Search"
-                width="full"
-                backgroundColor={"white"}
+                w="100%"
+                shadow="1"
+                my={"2"}
+                onChangeText={(value) => setSearch(value)}
+                size="md"
+                bg="white"
+                _focus={{
+                  bgColor: "white",
+                  borderColor: "gray.100",
+                }}
+                rounded={"md"}
+                InputRightElement={
+                  <Button
+                    rounded="none"
+                    size="lg"
+                    bgColor={BASE_COLOR.primary}
+                    onPress={getData}
+                    w="1/4"
+                  >
+                    Search
+                  </Button>
+                }
+                placeholder="masukan keyword..."
               />
               <HStack my={2} space={2}>
                 <Button
