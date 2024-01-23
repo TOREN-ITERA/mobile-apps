@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Button, HStack, Text, VStack } from "native-base";
+import { Box, Button, HStack, Input, Text, VStack } from "native-base";
 import Layout from "../components/Layout";
 import { RootParamList } from "../navigations";
 import { BASE_COLOR } from "../utilities/baseColor";
@@ -29,6 +29,8 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const [lastVisibleData, setlastVisibleData] = useState<any>();
+
+  const [filterBy, setFilterBy] = useState("");
 
   const getFirstDocument = async () => {
     const first = query(
@@ -80,6 +82,10 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
     getHistory();
   }, []);
 
+  useEffect(() => {
+    console.log("get data");
+  }, [filterBy]);
+
   if (isLoading) return <ListSkeleton />;
 
   return (
@@ -87,10 +93,64 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
       {historyList.length === 0 && (
         <EmptyAnimation title="Belum ada notifikasi" />
       )}
+
+      {/* <HStack space={3}>
+        {[1, 2].map((item) => (
+          <CardSkeleton key={item} />
+        ))}
+      </HStack>
+
+      <CardListSkeleton /> */}
+
       {historyList.length !== 0 && (
         <FlatList
           data={historyList}
           keyExtractor={(item) => item.historyId}
+          ListHeaderComponent={() => (
+            <Box>
+              <Input
+                mt={2}
+                placeholder="Search"
+                width="full"
+                backgroundColor={"white"}
+              />
+              <HStack my={2} space={2}>
+                <Button
+                  variant="subtle"
+                  borderColor={"gray.200"}
+                  borderWidth={1}
+                  colorScheme={"gray"}
+                  size={"md"}
+                  rounded={"xl"}
+                  onPress={() => setFilterBy("all")}
+                >
+                  Semua
+                </Button>
+                <Button
+                  variant="subtle"
+                  borderColor={"gray.200"}
+                  borderWidth={1}
+                  colorScheme={"gray"}
+                  size={"md"}
+                  rounded={"xl"}
+                  onPress={() => setFilterBy("new")}
+                >
+                  Terbaru
+                </Button>
+                <Button
+                  variant="subtle"
+                  borderColor={"gray.200"}
+                  borderWidth={1}
+                  colorScheme={"gray"}
+                  size={"md"}
+                  rounded={"xl"}
+                  onPress={() => setFilterBy("new")}
+                >
+                  Terbaru
+                </Button>
+              </HStack>
+            </Box>
+          )}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={getHistory} />
           }

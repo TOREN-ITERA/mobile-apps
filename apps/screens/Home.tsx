@@ -276,8 +276,8 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
                 />
               </CardStyle>
               <CardStyle
-                onClick={() => setWaterPumpStatus(!waterPumpStatus)}
                 status={waterPumpStatus}
+                onClick={() => {}}
                 title="water pump"
               >
                 <MaterialCommunityIcons
@@ -288,10 +288,8 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
               </CardStyle>
 
               <CardStyle
-                onClick={() =>
-                  setInternetConnectionStatus(!internetConnectionStatus)
-                }
                 status={internetConnectionStatus}
+                onClick={() => {}}
                 title="connection"
               >
                 <Entypo
