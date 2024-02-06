@@ -38,7 +38,7 @@ export default function UsersListScreen({ navigation }: UserListPropsTypes) {
       {userList.length !== 0 && (
         <FlatList
           data={userList}
-          keyExtractor={(item) => item.userId}
+          keyExtractor={(item) => item.userId + Date.now()}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={getUsers} />
           }

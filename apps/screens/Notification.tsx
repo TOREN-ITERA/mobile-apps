@@ -84,6 +84,7 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
   }, []);
 
   const getData = async () => {
+    console.log(search);
     console.log("get data");
   };
 
@@ -102,88 +103,10 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
       {historyList.length !== 0 && (
         <FlatList
           data={historyList}
-          keyExtractor={(item) => item.historyId}
-          ListHeaderComponent={() => (
-            <Box>
-              <Input
-                w="100%"
-                shadow="1"
-                my={"2"}
-                onChangeText={(value) => setSearch(value)}
-                size="md"
-                bg="white"
-                _focus={{
-                  bgColor: "white",
-                  borderColor: "gray.100",
-                }}
-                rounded={"md"}
-                InputRightElement={
-                  <Button
-                    rounded="none"
-                    size="lg"
-                    bgColor={BASE_COLOR.primary}
-                    onPress={getData}
-                    w="1/4"
-                  >
-                    Search
-                  </Button>
-                }
-                placeholder="masukan keyword..."
-              />
-              <HStack my={2} space={2}>
-                <Button
-                  variant="subtle"
-                  borderColor={"gray.200"}
-                  borderWidth={1}
-                  colorScheme={"gray"}
-                  size={"md"}
-                  rounded={"xl"}
-                  onPress={() => setFilterBy("all")}
-                >
-                  Semua
-                </Button>
-                <Button
-                  variant="subtle"
-                  borderColor={"gray.200"}
-                  borderWidth={1}
-                  colorScheme={"gray"}
-                  size={"md"}
-                  rounded={"xl"}
-                  onPress={() => setFilterBy("new")}
-                >
-                  Terbaru
-                </Button>
-                <Button
-                  variant="subtle"
-                  borderColor={"gray.200"}
-                  borderWidth={1}
-                  colorScheme={"gray"}
-                  size={"md"}
-                  rounded={"xl"}
-                  onPress={() => setFilterBy("new")}
-                >
-                  Terbaru
-                </Button>
-              </HStack>
-            </Box>
-          )}
+          keyExtractor={(item) => item.historyCreatedAt + Date.now()}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={getHistory} />
           }
-          ListFooterComponent={() => (
-            <HStack
-              backgroundColor="white"
-              p="5"
-              my="1"
-              borderWidth="1"
-              borderColor="gray.200"
-              justifyContent="space-between"
-            >
-              <Button>Previous</Button>
-              <Button onPress={getFirstDocument}>start</Button>
-              <Button onPress={getNextDocument}>Next</Button>
-            </HStack>
-          )}
           renderItem={({ item }) => (
             <VStack
               backgroundColor={"#FFF"}

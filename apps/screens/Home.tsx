@@ -34,7 +34,6 @@ import {
 } from "@expo/vector-icons";
 import { heightPercentage, widthPercentage } from "../utilities/dimension";
 import CircularProgress from "react-native-circular-progress-indicator";
-import ModalPrimary from "../components/Modal/ModalPrimary";
 
 type HomeScreenPropsTypes = NativeStackScreenProps<RootParamList, "Home">;
 
@@ -135,46 +134,22 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
       ),
       headerRight: () => (
         <HStack px="3" alignItems="center" space={2}>
-          {currentUser.userAuthentication && (
-            <Pressable onPress={() => navigation.navigate("Notification")}>
-              <Ionicons
-                name="ios-notifications"
-                size={25}
-                color={BASE_COLOR.text.primary}
-              />
-              <Box
-                rounded="full"
-                backgroundColor="red.500"
-                top="0"
-                right="0"
-                p="2"
-                position="absolute"
-                zIndex="2"
-              />
-            </Pressable>
-          )}
-          {!currentUser.userAuthentication && (
-            <Pressable
-              borderWidth="1"
-              borderColor={BASE_COLOR.text.primary}
-              px="2"
-              mx="2"
-              p="1"
-              rounded="md"
-              onPress={() => navigation.navigate("Login")}
-              _pressed={{
-                backgroundColor: BASE_COLOR.blue[100],
-              }}
-            >
-              <Text
-                color={BASE_COLOR.text.primary}
-                fontSize="md"
-                fontWeight="bold"
-              >
-                Login
-              </Text>
-            </Pressable>
-          )}
+          <Pressable onPress={() => navigation.navigate("Notification")}>
+            <Ionicons
+              name="ios-notifications"
+              size={25}
+              color={BASE_COLOR.text.primary}
+            />
+            <Box
+              rounded="full"
+              backgroundColor="red.500"
+              top="0"
+              right="0"
+              p="2"
+              position="absolute"
+              zIndex="2"
+            />
+          </Pressable>
         </HStack>
       ),
     });
@@ -275,11 +250,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
                   color={deviceStatus ? "white" : "red"}
                 />
               </CardStyle>
-              <CardStyle
-                status={waterPumpStatus}
-                onClick={() => {}}
-                title="water pump"
-              >
+              <CardStyle status={waterPumpStatus} title="water pump">
                 <MaterialCommunityIcons
                   name="water-pump"
                   size={24}
@@ -287,11 +258,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
                 />
               </CardStyle>
 
-              <CardStyle
-                status={internetConnectionStatus}
-                onClick={() => {}}
-                title="connection"
-              >
+              <CardStyle status={internetConnectionStatus} title="connection">
                 <Entypo
                   name="signal"
                   size={24}
@@ -323,9 +290,6 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
               activeStrokeColor={BASE_COLOR.primary}
               valueSuffix={"%"}
             />
-            <Text mt={5} color={BASE_COLOR.primary}>
-              1 hour and 22 minutes left
-            </Text>
           </Box>
         </ScrollView>
       )}
@@ -334,7 +298,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
         isOpen={showModalPasswordVerification}
         onClose={() => setShowModalPasswordVerification(false)}
       >
-        <Modal.Content maxWidth="400px">
+        <Modal.Content>
           <Modal.CloseButton />
           <Modal.Header>Verification</Modal.Header>
           <Modal.Body>
@@ -374,7 +338,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
 }
 
 interface ICardStyleModel {
-  onClick: (value: boolean) => void;
+  onClick?: (value: boolean) => void;
   status: boolean;
   children: React.FC<PropsWithChildren>;
   title: string;
@@ -382,7 +346,11 @@ interface ICardStyleModel {
 
 const CardStyle: any = (props: ICardStyleModel) => {
   return (
-    <Pressable onPress={() => props.onClick(!props.status)}>
+    <Pressable
+      onPress={() =>
+        props.onClick ? props.onClick(!props.status) : () => null
+      }
+    >
       <Box
         borderWidth={1}
         borderColor="gray.200"
