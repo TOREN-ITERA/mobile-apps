@@ -113,7 +113,7 @@ const NotificationScreen = ({ navigation }: NotificationScreenPropsTypes) => {
               my="1"
               minH="20"
               borderWidth="1"
-              borderColor="gray.200"
+              borderColor="gray.300"
               p="2"
               justifyContent="space-between"
             >

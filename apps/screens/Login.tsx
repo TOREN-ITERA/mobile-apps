@@ -130,6 +130,7 @@ export default function LoginScreen({ navigation }: LoginScreenPropsTypes) {
             <Input
               isInvalid={errorInput.isError && errorInput.inputName === "email"}
               onChangeText={handleSetEmail}
+              size={"lg"}
               bgColor="#FFF"
               InputLeftElement={
                 <Icon
@@ -159,6 +160,7 @@ export default function LoginScreen({ navigation }: LoginScreenPropsTypes) {
             <FormControl.Label>Password</FormControl.Label>
             <Input
               onChangeText={handleSetPassword}
+              size={"lg"}
               isInvalid={
                 errorInput.isError && errorInput.inputName === "password"
               }
@@ -176,7 +178,7 @@ export default function LoginScreen({ navigation }: LoginScreenPropsTypes) {
                         name={showPassword ? "visibility" : "visibility-off"}
                       />
                     }
-                    size={5}
+                    size={7}
                     mr="2"
                     color="muted.400"
                   />
@@ -215,7 +217,7 @@ export default function LoginScreen({ navigation }: LoginScreenPropsTypes) {
             onPress={handleSubmit}
             disabled={isLoading}
             bg={BASE_COLOR.primary}
-            p="2"
+            p="2.5"
             rounded="xl"
             _pressed={{ bg: BASE_COLOR.blue[200] }}
           >

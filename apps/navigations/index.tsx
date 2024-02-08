@@ -40,7 +40,7 @@ function TabNavigation() {
         tabBarStyle: { minHeight: heightPercentage(7) },
         headerTitleStyle: {
           fontFamily: "lato",
-          color: BASE_COLOR.text.primary,
+          color: BASE_COLOR.primary,
         },
         tabBarIcon: ({ color }) => {
           switch (route.name) {
@@ -90,7 +90,6 @@ const MyTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: "rgb(255, 45, 85)",
   },
 };
 
@@ -101,30 +100,34 @@ export default function AppNavigations() {
   useEffect(() => {
     onAuthStateChanged(firebaseConfigs.auth, (user) => {
       (async () => {
-        if (user) {
-          const userDb = new FirestoreDB(COLLECTION.USERS);
-          const userData: IUserModel = await userDb.getDocument({
-            documentId: user.email + "",
-          });
-          userData.userAuthentication = true;
-          setCurrentUser(userData);
-        }
+        try {
+          if (user) {
+            const userDb = new FirestoreDB(COLLECTION.USERS);
+            const userData: IUserModel = await userDb.getDocument({
+              documentId: user.email + "",
+            });
+            setCurrentUser({ ...userData, userAuthentication: true });
+          }
 
-        if (!user) {
-          const userData: IUserModel = {
-            userAuthentication: false,
-            userEmail: "",
-            userName: "",
-            userId: "",
-            userPassword: "",
-          };
-          setCurrentUser(userData);
-        }
+          if (!user) {
+            const userData: IUserModel = {
+              userAuthentication: false,
+              userEmail: "",
+              userName: "",
+              userId: "",
+              userPassword: "",
+            };
+            setCurrentUser(userData);
+          }
 
-        const appDB = new FirestoreDB(COLLECTION.APP);
-        const appStatus = await appDB.getDocument({ documentId: "appId" });
-        setAppState(appStatus);
-        setIsLoading(false);
+          const appDB = new FirestoreDB(COLLECTION.APP);
+          const appStatus = await appDB.getDocument({ documentId: "appId" });
+          setAppState(appStatus);
+        } catch (error: any) {
+          console.log(error);
+        } finally {
+          setIsLoading(false);
+        }
       })();
     });
   }, []);
@@ -139,7 +142,7 @@ export default function AppNavigations() {
           backgroundColor: "#FFF",
         }}
       >
-        <Text style={{ color: BASE_COLOR.text.primary }}>Loading...</Text>
+        <Text style={{ color: BASE_COLOR.primary }}>Loading...</Text>
         <StatusBar barStyle="default" backgroundColor="#FFF" />
       </View>
     );
@@ -151,7 +154,7 @@ export default function AppNavigations() {
         screenOptions={{
           headerTitleStyle: {
             fontFamily: "lato",
-            color: BASE_COLOR.text.primary,
+            color: BASE_COLOR.primary,
           },
         }}
       >

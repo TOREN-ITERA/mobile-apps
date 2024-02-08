@@ -101,7 +101,7 @@ export default function HistoryScreen({ navigation }: HistoryPropsTypes) {
               p="5"
               my="1"
               borderWidth="1"
-              borderColor="gray.200"
+              borderColor="gray.300"
               justifyContent="space-between"
             >
               <Button>Previous</Button>

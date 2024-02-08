@@ -16,7 +16,6 @@ type ProfilePropsTypes = NativeStackScreenProps<RootParamList, "Profile">;
 export default function ProfileScreen({ navigation }: ProfilePropsTypes) {
   const { currentUser, appState } = useAppContext();
 
-  console.log(currentUser);
   const [openModal, setOpenModal] = useState(false);
 
   const handleLogOut = async () => {
@@ -38,7 +37,6 @@ export default function ProfileScreen({ navigation }: ProfilePropsTypes) {
       >
         <VStack alignItems="center" space={2}>
           <Avatar
-            backgroundColor={BASE_COLOR.primary}
             size="xl"
             source={{
               uri: "https://vasundharaodisha.org/upload/84552no-user.jpg",
@@ -51,18 +49,30 @@ export default function ProfileScreen({ navigation }: ProfilePropsTypes) {
           <Text color={BASE_COLOR.text.primary}>{currentUser.userEmail}</Text>
         </VStack>
       </VStack>
-      <CardProfileList onPress={() => null}>
+      {/* <CardProfileList onPress={() => null}>
         <AntDesign name="setting" size={24} color={BASE_COLOR.text.primary} />
         <Text fontSize="md" fontWeight="bold" color={BASE_COLOR.text.primary}>
           Settings
         </Text>
-      </CardProfileList>
-      <CardProfileList onPress={() => {}}>
+      </CardProfileList> */}
+
+      <HStack
+        backgroundColor="#FFF"
+        p={5}
+        space={5}
+        alignItems="flex-end"
+        borderWidth={1}
+        borderColor="gray.200"
+        my={1}
+        borderRadius="5"
+        rounded="md"
+      >
         <Entypo name="code" size={24} color={BASE_COLOR.text.primary} />
         <Text fontSize="md" fontWeight="bold" color={BASE_COLOR.text.primary}>
           Version {appState.appVersion ?? "1.0"}
         </Text>
-      </CardProfileList>
+      </HStack>
+
       <CardProfileList onPress={() => setOpenModal(true)}>
         <Ionicons
           name="exit-outline"

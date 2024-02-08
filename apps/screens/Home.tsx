@@ -132,26 +132,22 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
           <Feather name="droplet" size={24} color={BASE_COLOR.primary} />
         </HStack>
       ),
-      headerRight: () => (
-        <HStack px="3" alignItems="center" space={2}>
-          <Pressable onPress={() => navigation.navigate("Notification")}>
-            <Ionicons
-              name="ios-notifications"
-              size={25}
-              color={BASE_COLOR.text.primary}
-            />
-            <Box
-              rounded="full"
-              backgroundColor="red.500"
-              top="0"
-              right="0"
-              p="2"
-              position="absolute"
-              zIndex="2"
-            />
-          </Pressable>
-        </HStack>
-      ),
+      // headerRight: () => (
+      //   <HStack px="3" alignItems="center" space={2}>
+      //     <Pressable onPress={() => navigation.navigate("Notification")}>
+      //       <Ionicons name="ios-notifications" size={30} color={"gray"} />
+      //       <Box
+      //         rounded="full"
+      //         backgroundColor="red.500"
+      //         top="0"
+      //         right="0"
+      //         p="2"
+      //         position="absolute"
+      //         zIndex="2"
+      //       />
+      //     </Pressable>
+      //   </HStack>
+      // ),
     });
   }, [currentUser]);
 
@@ -181,32 +177,24 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
           >
             <HStack padding={1} space={2} alignItems={"center"}>
               <HStack padding={1} space={2} alignItems={"center"}>
-                <Box bg={"blue.100"} rounded="full" p={1}>
-                  <Ionicons
-                    name="flash"
-                    size={20}
-                    color={BASE_COLOR.blue[200]}
-                  />
+                <Box bg={"blue.50"} rounded="full" p={1}>
+                  <Ionicons name="flash" size={20} color={BASE_COLOR.primary} />
                 </Box>
                 <Text>current {deviceCurrentSensor}</Text>
               </HStack>
               <HStack padding={1} space={2} alignItems={"center"}>
-                <Box bg={"blue.100"} rounded="full" p={1}>
+                <Box bg={"blue.50"} rounded="full" p={1}>
                   <AntDesign
                     name="dashboard"
                     size={20}
-                    color={BASE_COLOR.blue[200]}
+                    color={BASE_COLOR.primary}
                   />
                 </Box>
                 <Text>water flow {deviceWaterFlowProgress}</Text>
               </HStack>
               <HStack padding={1} space={2} alignItems={"center"}>
-                <Box bg={"blue.100"} rounded="full" p={1}>
-                  <Feather
-                    name="users"
-                    size={20}
-                    color={BASE_COLOR.blue[200]}
-                  />
+                <Box bg={"blue.50"} rounded="full" p={1}>
+                  <Feather name="users" size={20} color={BASE_COLOR.primary} />
                 </Box>
                 <Text>users {totalUser}</Text>
               </HStack>
@@ -214,12 +202,8 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
 
             <HStack padding={1} space={2} alignItems={"center"}>
               <HStack padding={1} space={2} alignItems={"center"}>
-                <Box bg={"blue.100"} rounded="full" p={1}>
-                  <Entypo
-                    name="signal"
-                    size={18}
-                    color={BASE_COLOR.blue[200]}
-                  />
+                <Box bg={"blue.50"} rounded="full" p={1}>
+                  <Entypo name="signal" size={18} color={BASE_COLOR.primary} />
                 </Box>
                 <Text>{deviceConnectionType}</Text>
               </HStack>
@@ -299,13 +283,14 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
         onClose={() => setShowModalPasswordVerification(false)}
       >
         <Modal.Content>
-          <Modal.CloseButton />
           <Modal.Header>Verification</Modal.Header>
           <Modal.Body>
             <FormControl>
               <FormControl.Label>Password</FormControl.Label>
               <Input
                 type="password"
+                size={"lg"}
+                placeholder="masukan password"
                 onChangeText={(value) => setPasswordVerification(value)}
               />
             </FormControl>
@@ -315,6 +300,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
               <Button
                 variant="ghost"
                 colorScheme="blueGray"
+                size={"lg"}
                 onPress={() => {
                   setShowModalPasswordVerification(false);
                 }}
@@ -322,6 +308,7 @@ export default function HomeScreen({ navigation }: HomeScreenPropsTypes) {
                 Cancel
               </Button>
               <Button
+                size={"lg"}
                 onPress={() => {
                   handleUpdateDeviceStatus();
                   setShowModalPasswordVerification(false);
@@ -364,7 +351,7 @@ const CardStyle: any = (props: ICardStyleModel) => {
         alignItems="center"
       >
         <Box
-          backgroundColor={props.status ? "lightBlue.400" : "red.100"}
+          backgroundColor={props.status ? BASE_COLOR.primary : "red.100"}
           p="10"
           rounded="full"
         >
